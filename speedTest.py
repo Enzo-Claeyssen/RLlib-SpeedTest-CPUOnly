@@ -31,6 +31,16 @@ from ray.rllib.connectors.env_to_module import FlattenObservations  # Needed for
 N_ITER = 20
 
 
+# Limiting the number of threads used by torch
+import os
+import torch
+
+os.environ["OMP_NUM_THREADS"] = "1"
+os.environ["MKL_NUM_THREADS"] = "1"
+os.environ["OPENBLAS_NUM_THREADS"] = "1"
+
+torch.set_num_threads(1)
+
 
 
 # Maze Environment
@@ -160,6 +170,14 @@ config = (
     
     .env_runners(
         env_to_module_connector=lambda env: FlattenObservations(), # Enable one hot encoding
+        num_env_runners=0,
+        num_envs_per_env_runner=1,
+        num_cpus_per_env_runner=1,
+    )
+    
+    .learners(
+        num_learners=0,
+        num_cpus_per_learner=1
     )
 )
 
